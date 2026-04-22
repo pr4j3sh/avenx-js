@@ -1,0 +1,24 @@
+<state count="0" step="1" />
+
+<action name="log">
+    console.log("Neuer Stand:", count);
+</action>
+
+<div>
+    <@css />
+
+    <h1 @click="count = 0">
+        <@css />
+        Hoe-JS @css PoC
+    </h1>
+    
+    <div>
+        <@css />
+        {{ count }}
+    </div>
+
+    <button @click="count += step; log()">
+        <@css />
+        Erhöhen (+{{ step }})
+    </button>
+</div>
