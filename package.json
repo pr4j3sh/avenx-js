@@ -18,7 +18,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node test/cli.test.js"
+    "test": "node test/cli.test.js",
+    "bench": "node benches/run.js"
   },
   "keywords": [
     "reactive",

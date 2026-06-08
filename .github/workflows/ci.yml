@@ -22,3 +22,6 @@ jobs:
 
       - name: run tests
         run: npm test
+
+      - name: run benchmarks
+        run: npm run bench
