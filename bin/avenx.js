@@ -39,6 +39,7 @@ class AvenxCLI {
                 }
                 break;
             case 'build':
+            case 'b':
                 this.buildProject();
                 break;
             case 'serve':
@@ -119,7 +120,7 @@ class AvenxCLI {
             .split(/[-_]/)
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
             .join('') + "Bridge";
-        
+
         const globalDir = path.join(this.baseDir, 'src/global');
         if (!fs.existsSync(globalDir)) {
             fs.mkdirSync(globalDir, { recursive: true });
@@ -195,7 +196,7 @@ class AvenxCLI {
             .split(/[-_]/)
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
             .join('');
-        
+
         const pageDir = path.join(this.baseDir, 'src/pages');
         if (!fs.existsSync(pageDir)) {
             fs.mkdirSync(pageDir, { recursive: true });
@@ -233,7 +234,7 @@ class AvenxCLI {
             .split(/[-_]/)
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
             .join('');
-        
+
         const compDir = path.join(this.baseDir, 'src/components', lowerName);
 
         if (fs.existsSync(compDir)) {
@@ -341,7 +342,7 @@ class AvenxCLI {
             }
 
             let filePath = path.join(this.baseDir, req.url === '/' ? 'index.html' : req.url);
-            
+
             if (!fs.existsSync(filePath) && !path.extname(filePath)) {
                 filePath = path.join(this.baseDir, 'index.html');
             }
@@ -464,6 +465,7 @@ Commands:
   generate component <name> Generate a new component (alias: g)
   generate page <name>      Generate a new page (alias: g p)
   generate bridge <name>    Generate a new shared reactive bridge
+  build (b)                 Build the project into dist/bundle.js
   generate guard <name>     Generate a new route guard
   build                     Build the project into dist/bundle.js
   serve [port]              Start dev server with hot-reload (default: 3000)
