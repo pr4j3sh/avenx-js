@@ -41,6 +41,19 @@ try {
     assert.strictEqual(singleQuoteState.count, 0);
     assert.strictEqual(singleQuoteState.flag, true);
 
+    // 2b. Test coercion of arrays and objects in state tags with single quotes
+    const contentSingleQuoteCoercion = `
+    <state
+        arrSingle="['a', 'b', 'c']"
+        objSingle="{'name': 'avenx', 'version': '1.0'}"
+        normalStr="just a normal string with 'single' quotes"
+    />
+    `;
+    const coercedState = ep.parseState(contentSingleQuoteCoercion);
+    assert.deepStrictEqual(coercedState.arrSingle, ['a', 'b', 'c']);
+    assert.deepStrictEqual(coercedState.objSingle, { name: 'avenx', version: '1.0' });
+    assert.strictEqual(coercedState.normalStr, "just a normal string with 'single' quotes");
+
     // 3. Test computed parsing (single quotes, double quotes, and arbitrary attribute ordering)
     const contentComputed = `
     <computed name="double" value="count * 2" />
