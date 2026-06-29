@@ -21,6 +21,8 @@ Each error is prefixed with a code like `[AVX_C01]` or `[AVX_R01]`, which helps 
 | [AVX_R07](#avx_r07) | Error Log | Runtime | Unhandled error thrown inside navigation guard `canActivate()`. |
 | [AVX_R08](#avx_r08) | Warning | Runtime | Interpolation expression `{{ ... }}` template rendering failed. |
 | [AVX_R09](#avx_r09) | Error Log | Runtime | Inline event action statement execution failed. |
+| [AVX_R10](#avx_r10) | Throw Exception | Runtime | Shared state bridge with the same name already registered. |
+| [AVX_R11](#avx_r11) | Throw Exception | Runtime | State mutation detected during the update/render lifecycle. |
 
 ---
 
@@ -97,3 +99,15 @@ Each error is prefixed with a code like `[AVX_C01]` or `[AVX_R01]`, which helps 
 * **Type:** Console Error Log
 * **Cause:** An inline event handler attribute (e.g. `@click="increment()"`) threw an exception during callback execution.
 * **Resolution:** Verify that the target method exists on your component class and is spelled correctly, and that parameters passed are defined in scope.
+
+### AVX_R10
+* **Message:** `Bridge "{name}" is already registered. Available bridges: {list}. Suggestion: {suggestion}`
+* **Type:** Throw Exception (`AvenxError`)
+* **Cause:** The application tried to register a bridge with a name that is already in use.
+* **Resolution:** Ensure bridge names are unique. If you need to register a new bridge, choose a different name.
+
+### AVX_R11
+* **Message:** `State mutation detected during the update/render lifecycle. Avoid modifying component state inside templates, getters, computed property definitions, or lifecycle hooks like onUpdate.`
+* **Type:** Throw Exception (`AvenxError`)
+* **Cause:** Modifying properties in `this.state` or `this.props` during the rendering or updating lifecycle of the component (such as inside a computed property definition, getter, template interpolation expression, or lifecycle hooks like `onUpdate`).
+* **Resolution:** Avoid synchronous state changes inside the update lifecycle. If you need to update state in response to an update, defer it to the next microtask (e.g. using `setTimeout` or `Promise.resolve().then()`), or compute the value using a computed property.
