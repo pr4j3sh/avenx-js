@@ -29,6 +29,7 @@ Every contribution — whether code, documentation, or ideas — helps move the 
 - [@Nawal-Shahid](https://github.com/Nawal-Shahid)
 - [@vIktoiiaa](https://github.com/vIktoiiaa)
 - [@ramizqazi](https://github.com/ramizqazi)
+- [@Abhijay-29r](https://github.com/Abhijay-29r)
 
 ---
 
