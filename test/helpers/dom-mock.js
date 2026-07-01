@@ -123,8 +123,20 @@ class MockDOMElement {
    *
    * @param selector
    */
-  querySelectorAll() {
-    // Gibt eine leere Liste zurück, da dieses Element keine verschachtelten slot-Elemente hat
+  querySelectorAll(selector) {
+    if (selector === '*') {
+      const results = [];
+      const traverse = (node) => {
+        node.childNodes.forEach((child) => {
+          if (child.nodeType === 1) {
+            results.push(child);
+            traverse(child);
+          }
+        });
+      };
+      traverse(this);
+      return results;
+    }
     return [];
   }
 
