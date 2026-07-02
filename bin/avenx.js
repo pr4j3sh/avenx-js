@@ -515,8 +515,9 @@ class AvenxCLI {
     return `<!DOCTYPE html>
 <html>
 <head>
-    <title>My Avenx App</title>
-    <link rel="stylesheet" href="dist/bundle.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Avenx App</title>
+  <link rel="stylesheet" href="dist/bundle.css">
 </head>
 <body>
     <div id="app"></div>
