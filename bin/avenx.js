@@ -165,7 +165,16 @@ class AvenxCLI {
       );
       console.log('  Created: src/main.app.js');
     }
+    // Create initial .gitignore
+    const gitignorePath = path.join(this.baseDir, '.gitignore');
 
+    if (!fs.existsSync(gitignorePath)) {
+      fs.writeFileSync(
+        gitignorePath,
+        'node_modules/\ndist/\n.DS_Store\n',
+      );
+      console.log('  Created: .gitignore');
+    }
     console.log('✅ Project initialized successfully!');
   }
 
