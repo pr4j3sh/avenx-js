@@ -67,7 +67,7 @@ function runTest() {
     console.log('✅ All init tests passed!');
 
     console.log('🧪 Testing avenx build...');
-    execSync(`node ${BIN_PATH} build`, { cwd: TEST_DIR });
+    const buildOutput = execSync(`node ${BIN_PATH} build 2>&1`, { cwd: TEST_DIR, encoding: 'utf8' });
 
     const bundleJsPath = path.join(TEST_DIR, 'dist/bundle.js');
     const bundleCssPath = path.join(TEST_DIR, 'dist/bundle.css');
@@ -78,6 +78,16 @@ function runTest() {
     assert.ok(bundleContent.includes('class HtmlEscaper'), 'bundle.js should contain HtmlEscaper');
     assert.ok(bundleContent.includes('class SafeHtml'), 'bundle.js should contain SafeHtml');
     assert.ok(bundleContent.includes('function html('), 'bundle.js should contain html function');
+
+    assert.match(buildOutput, /Asset sizes:/, 'prints asset size');
+    assert.match(buildOutput, /bundle\.js: \d+\.\d{2} KB/, 'prints bundle.js asset size');
+
+    assert.match(
+      buildOutput,
+      /WARNING: bundle\.js exceeds 50 KB \(\d+\.\d{2} KB\)/,
+      'warns when bundle.js exceeds threshold',
+    );
+    assert.match(buildOutput, /bundle\.css: \d+\.\d{2} KB/, 'prints bundle.css size');
 
     console.log('✅ All build tests passed!');
 
