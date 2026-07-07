@@ -1,10 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 const TEST_DIR = path.join(__dirname, 'test-project');
 const BIN_PATH = path.join(__dirname, '../../bin/avenx.js');
+
+/**
+ *
+ * @param {string[]} args
+ * @returns {import('child_process').SpawnSyncReturns<string>}
+ */
+function runCli(args) {
+  return spawnSync(process.execPath, [BIN_PATH, ...args], {
+    cwd: TEST_DIR,
+    encoding: 'utf8',
+  });
+}
 
 /**
  *
@@ -99,6 +111,19 @@ function runTest() {
     );
     assert.ok(defaultBoxJs.includes('DefaultBox Component'), 'Should contain default title');
 
+    const duplicateComponentResult = runCli(['generate', 'component', 'default-box']);
+    assert.strictEqual(duplicateComponentResult.status, 1, 'Duplicate component generation should fail');
+    assert.match(
+      duplicateComponentResult.stderr,
+      /Component 'default-box' already exists/,
+      'Duplicate component generation should explain the existing path',
+    );
+    assert.strictEqual(
+      fs.readFileSync(path.join(TEST_DIR, 'src/components/default-box/default-box.component.js'), 'utf-8'),
+      defaultBoxJs,
+      'Duplicate component generation should not overwrite existing component files',
+    );
+
     console.log('🧪 Testing avenx generate component with camelCase name...');
     execSync(`node ${BIN_PATH} generate component UserProfile`, { cwd: TEST_DIR });
     const userProfileJs = fs.readFileSync(
@@ -176,6 +201,25 @@ function runTest() {
       '/* CUSTOM STRUCTURED CSS */',
       'Should prioritize custom structured CSS template',
     );
+
+    console.log('🧪 Testing avenx generate page does not overwrite partial existing files...');
+    const pageCssPath = path.join(TEST_DIR, 'src/pages/reports.page.css');
+    const pageJsPath = path.join(TEST_DIR, 'src/pages/reports.page.js');
+    fs.writeFileSync(pageCssPath, '/* keep existing page styles */');
+
+    const duplicatePageResult = runCli(['generate', 'page', 'reports']);
+    assert.strictEqual(duplicatePageResult.status, 1, 'Page generation should fail when any target file exists');
+    assert.match(
+      duplicatePageResult.stderr,
+      /Page 'reports' already exists/,
+      'Page generation should explain which page already exists',
+    );
+    assert.strictEqual(
+      fs.readFileSync(pageCssPath, 'utf-8'),
+      '/* keep existing page styles */',
+      'Page generation should not overwrite existing CSS when JS is missing',
+    );
+    assert.ok(!fs.existsSync(pageJsPath), 'Page generation should not create JS after detecting an existing CSS file');
 
     console.log('✅ Custom project-level templates tests passed!');
   } catch (error) {

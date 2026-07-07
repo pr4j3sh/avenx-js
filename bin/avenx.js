@@ -66,6 +66,35 @@ class AvenxCLI {
   }
 
   /**
+   * Reports a CLI error and marks the process as failed.
+   * @param {string} message
+   */
+  fail(message) {
+    console.error(`\x1b[31m❌ Error: ${message}\x1b[0m`);
+    process.exitCode = 1;
+  }
+
+  /**
+   * Stops generation if any target path already exists.
+   * @param {string} type
+   * @param {string} name
+   * @param {string[]} targetPaths
+   * @returns {boolean}
+   */
+  abortIfGeneratedPathExists(type, name, targetPaths) {
+    const existingPath = targetPaths.find((targetPath) => fs.existsSync(targetPath));
+    if (!existingPath) {
+      return false;
+    }
+
+    this.fail(
+      `${type} '${name}' already exists at ${path.relative(this.baseDir, existingPath)}. ` +
+        'Remove the existing file or choose a different name.',
+    );
+    return true;
+  }
+
+  /**
    * Executes a given CLI command with provided arguments.
    * @param {string} command - The command to run (e.g., 'init', 'generate', 'build', 'serve', 'help').
    * @param {string[]} args - Additional arguments for the command.
@@ -178,7 +207,7 @@ class AvenxCLI {
    */
   generateBridge(name) {
     if (!name) {
-      console.error('❌ Error: Please provide a bridge name (e.g., avenx g bridge auth)');
+      this.fail('Please provide a bridge name (e.g., avenx g bridge auth)');
       return;
     }
 
@@ -192,8 +221,7 @@ class AvenxCLI {
 
     const bridgePath = path.join(globalDir, `${lowerName}.bridge.js`);
 
-    if (fs.existsSync(bridgePath)) {
-      console.error(`❌ Error: Bridge '${lowerName}' already exists.`);
+    if (this.abortIfGeneratedPathExists('Bridge', lowerName, [bridgePath])) {
       return;
     }
 
@@ -211,7 +239,7 @@ class AvenxCLI {
    */
   generateGuard(name) {
     if (!name) {
-      console.error('❌ Error: Please provide a guard name (e.g., avenx g guard auth)');
+      this.fail('Please provide a guard name (e.g., avenx g guard auth)');
       return;
     }
 
@@ -225,8 +253,7 @@ class AvenxCLI {
 
     const guardPath = path.join(guardDir, `${lowerName}.guard.js`);
 
-    if (fs.existsSync(guardPath)) {
-      console.error(`❌ Error: Guard '${lowerName}' already exists.`);
+    if (this.abortIfGeneratedPathExists('Guard', lowerName, [guardPath])) {
       return;
     }
 
@@ -244,7 +271,7 @@ class AvenxCLI {
    */
   generatePage(name) {
     if (!name) {
-      console.error('❌ Error: Please provide a page name (e.g., avenx g page home)');
+      this.fail('Please provide a page name (e.g., avenx g page home)');
       return;
     }
 
@@ -258,8 +285,7 @@ class AvenxCLI {
     const jsPath = path.join(pageDir, `${lowerName}.page.js`);
     const cssPath = path.join(pageDir, `${lowerName}.page.css`);
 
-    if (fs.existsSync(jsPath)) {
-      console.error(`❌ Error: Page '${lowerName}' already exists.`);
+    if (this.abortIfGeneratedPathExists('Page', lowerName, [jsPath, cssPath])) {
       return;
     }
 
@@ -279,7 +305,7 @@ class AvenxCLI {
    */
   generateComponent(name) {
     if (!name) {
-      console.error('❌ Error: Please provide a component name (e.g., avenx g my-component)');
+      this.fail('Please provide a component name (e.g., avenx g my-component)');
       return;
     }
 
@@ -287,8 +313,7 @@ class AvenxCLI {
 
     const compDir = path.join(this.baseDir, 'src/components', lowerName);
 
-    if (fs.existsSync(compDir)) {
-      console.error(`❌ Error: Component '${lowerName}' already exists.`);
+    if (this.abortIfGeneratedPathExists('Component', lowerName, [compDir])) {
       return;
     }
 
@@ -572,4 +597,3 @@ if (command === '-v' || command === '--version') {
   const cli = new AvenxCLI();
   cli.run(command, args);
 }
-
