@@ -8,15 +8,7 @@ const ComponentParser = require('../../lib/compiler/ComponentParser');
 // 1. Lightweight Mock DOM & HTML Parser
 // ==========================================
 
-/**
- *
- */
 class MockNode {
-  /**
-   *
-   * @param nodeType
-   * @param nodeName
-   */
   constructor(nodeType, nodeName) {
     this.nodeType = nodeType;
     this.nodeName = nodeName;
@@ -24,10 +16,6 @@ class MockNode {
     this.parentNode = null;
   }
 
-  /**
-   *
-   * @param child
-   */
   appendChild(child) {
     if (child.parentNode) {
       child.parentNode.removeChild(child);
@@ -37,10 +25,6 @@ class MockNode {
     return child;
   }
 
-  /**
-   *
-   * @param child
-   */
   removeChild(child) {
     const idx = this.childNodes.indexOf(child);
     if (idx !== -1) {
@@ -50,11 +34,6 @@ class MockNode {
     return child;
   }
 
-  /**
-   *
-   * @param newChild
-   * @param oldChild
-   */
   replaceChild(newChild, oldChild) {
     const idx = this.childNodes.indexOf(oldChild);
     if (idx !== -1) {
@@ -68,10 +47,6 @@ class MockNode {
     return oldChild;
   }
 
-  /**
-   *
-   * @param child
-   */
   contains(child) {
     let curr = child;
     while (curr) {
@@ -81,19 +56,12 @@ class MockNode {
     return false;
   }
 
-  /**
-   *
-   */
   remove() {
     if (this.parentNode) {
       this.parentNode.removeChild(this);
     }
   }
 
-  /**
-   *
-   * @param newNode
-   */
   after(newNode) {
     if (!this.parentNode) return;
     if (newNode.parentNode) {
@@ -107,93 +75,48 @@ class MockNode {
   }
 }
 
-/**
- *
- */
 class MockTextNode extends MockNode {
-  /**
-   *
-   * @param text
-   */
   constructor(text) {
     super(3, '#text');
     this.textContent = text;
   }
 
-  /**
-   *
-   * @param deep
-   */
   cloneNode() {
     return new MockTextNode(this.textContent);
   }
 }
 
-/**
- *
- */
 class MockElementNode extends MockNode {
-  /**
-   *
-   * @param tagName
-   * @param attrs
-   */
   constructor(tagName, attrs = {}) {
     super(1, tagName.toUpperCase());
     this.tagName = tagName.toUpperCase();
     this.attrs = { ...attrs };
   }
 
-  /**
-   *
-   */
   get attributes() {
     return Object.entries(this.attrs).map(([name, value]) => ({ name, value }));
   }
 
-  /**
-   *
-   * @param name
-   */
   hasAttribute(name) {
     return name in this.attrs;
   }
 
-  /**
-   *
-   * @param name
-   */
   getAttribute(name) {
     return name in this.attrs ? this.attrs[name] : null;
   }
 
-  /**
-   *
-   * @param name
-   * @param value
-   */
   setAttribute(name, value) {
     this.attrs[name] = String(value);
   }
 
-  /**
-   *
-   * @param name
-   */
   removeAttribute(name) {
     delete this.attrs[name];
   }
 
-  /**
-   *
-   */
   get textContent() {
     return this.childNodes.map((c) => c.textContent).join('');
   }
 
-  /**
-   *
-   */
   set textContent(val) {
     this.childNodes.forEach((c) => {
       c.parentNode = null;
@@ -202,9 +125,6 @@ class MockElementNode extends MockNode {
     this.appendChild(new MockTextNode(val));
   }
 
-  /**
-   *
-   */
   get innerHTML() {
     return this.childNodes
       .map((c) => {
@@ -218,9 +138,6 @@ class MockElementNode extends MockNode {
       .join('');
   }
 
-  /**
-   *
-   */
   set innerHTML(htmlStr) {
     this.childNodes.forEach((c) => {
       c.parentNode = null;
@@ -230,9 +147,6 @@ class MockElementNode extends MockNode {
     parsed.forEach((c) => this.appendChild(c));
   }
 
-  /**
-   *
-   */
   get outerHTML() {
     const attrsStr = Object.entries(this.attrs)
       .map(([name, value]) => {
@@ -240,13 +154,11 @@ class MockElementNode extends MockNode {
         return ` ${name}="${value}"`;
       })
       .join('');
+
     const tag = this.tagName.toLowerCase();
     return `<${tag}${attrsStr}>${this.innerHTML}</${tag}>`;
   }
 
-  /**
-   *
-   */
   get firstElementChild() {
     for (const child of this.childNodes) {
       if (child.nodeType === 1) {
@@ -256,12 +168,10 @@ class MockElementNode extends MockNode {
     return null;
   }
 
-  /**
-   *
-   */
   get previousElementSibling() {
     if (!this.parentNode) return null;
     const idx = this.parentNode.childNodes.indexOf(this);
+
     for (let i = idx - 1; i >= 0; i--) {
       const sibling = this.parentNode.childNodes[i];
       if (sibling.nodeType === 1) {
@@ -271,12 +181,10 @@ class MockElementNode extends MockNode {
     return null;
   }
 
-  /**
-   *
-   */
   get nextElementSibling() {
     if (!this.parentNode) return null;
     const idx = this.parentNode.childNodes.indexOf(this);
+
     for (let i = idx + 1; i < this.parentNode.childNodes.length; i++) {
       const sibling = this.parentNode.childNodes[i];
       if (sibling.nodeType === 1) {
@@ -286,26 +194,21 @@ class MockElementNode extends MockNode {
     return null;
   }
 
-  /**
-   *
-   * @param deep
-   */
   cloneNode(deep) {
     const copy = new MockElementNode(this.tagName, this.attrs);
+
     if (deep) {
       this.childNodes.forEach((c) => {
         copy.appendChild(c.cloneNode(true));
       });
     }
+
     return copy;
   }
 
-  /**
-   *
-   * @param selector
-   */
   querySelectorAll(selector) {
     const results = [];
+
     const matchSelector = (el) => {
       if (selector.includes('[')) {
         const parts = selector.split('[');
@@ -320,16 +223,19 @@ class MockElementNode extends MockNode {
           const [name, val] = attrPart.split('=');
           const cleanVal = val.replace(/^["']|["']$/g, '');
           return el.getAttribute(name) === cleanVal;
-        } else {
-          return el.hasAttribute(attrPart);
         }
-      } else if (selector.startsWith('.')) {
+
+        return el.hasAttribute(attrPart);
+      }
+
+      if (selector.startsWith('.')) {
         const className = selector.slice(1);
         return el.getAttribute('class') === className;
-      } else {
-        return el.tagName === selector.toUpperCase();
       }
+
+      return el.tagName === selector.toUpperCase();
     };
+
     const traverse = (node) => {
       node.childNodes.forEach((child) => {
         if (child.nodeType === 1) {
@@ -340,44 +246,27 @@ class MockElementNode extends MockNode {
         }
       });
     };
+
     traverse(this);
     return results;
   }
 
-  /**
-   *
-   * @param selector
-   */
   querySelector(selector) {
     const res = this.querySelectorAll(selector);
     return res.length > 0 ? res[0] : null;
   }
 }
 
-/**
- *
- * @param text
- */
 function createMockTextNode(text) {
   return new MockTextNode(text);
 }
 
-/**
- *
- * @param tagName
- * @param attrs
- * @param children
- */
 function createMockElementNode(tagName, attrs = {}, children = []) {
   const el = new MockElementNode(tagName, attrs);
   children.forEach((c) => el.appendChild(c));
   return el;
 }
 
-/**
- *
- * @param htmlStr
- */
 function parseHTML(htmlStr) {
   htmlStr = htmlStr.trim();
   if (!htmlStr) return [];
@@ -388,10 +277,12 @@ function parseHTML(htmlStr) {
   while (remaining.length > 0) {
     if (remaining.startsWith('<')) {
       const closeTagIndex = remaining.indexOf('>');
+
       if (closeTagIndex === -1) {
         nodes.push(createMockTextNode(remaining));
         break;
       }
+
       const tagContent = remaining.substring(1, closeTagIndex);
       const isSelfClosing = tagContent.endsWith('/');
       const cleanTagContent = isSelfClosing ? tagContent.slice(0, -1).trim() : tagContent.trim();
@@ -401,10 +292,12 @@ function parseHTML(htmlStr) {
       tagName = tagName.toUpperCase();
 
       const attrs = {};
+
       if (firstSpace !== -1) {
         const attrStr = cleanTagContent.substring(firstSpace + 1);
         const attrRegex = /([\w\d@:-]+)=["']([^"']*)["']/g;
         let attrMatch;
+
         while ((attrMatch = attrRegex.exec(attrStr)) !== null) {
           attrs[attrMatch[1]] = attrMatch[2];
         }
@@ -413,12 +306,12 @@ function parseHTML(htmlStr) {
       remaining = remaining.substring(closeTagIndex + 1);
 
       let children = [];
+
       if (!isSelfClosing) {
         const endTag = `</${tagName.toLowerCase()}>`;
         const endTagIndex = findClosingTagIndex(remaining, tagName);
-        if (endTagIndex === -1) {
-          // treat as self-closing
-        } else {
+
+        if (endTagIndex !== -1) {
           const body = remaining.substring(0, endTagIndex);
           children = parseHTML(body);
           remaining = remaining.substring(endTagIndex + endTag.length);
@@ -428,24 +321,21 @@ function parseHTML(htmlStr) {
       nodes.push(createMockElementNode(tagName, attrs, children));
     } else {
       const nextTag = remaining.indexOf('<');
+
       if (nextTag === -1) {
         nodes.push(createMockTextNode(remaining));
         break;
-      } else {
-        const text = remaining.substring(0, nextTag);
-        nodes.push(createMockTextNode(text));
-        remaining = remaining.substring(nextTag);
       }
+
+      const text = remaining.substring(0, nextTag);
+      nodes.push(createMockTextNode(text));
+      remaining = remaining.substring(nextTag);
     }
   }
+
   return nodes;
 }
 
-/**
- *
- * @param str
- * @param tagName
- */
 function findClosingTagIndex(str, tagName) {
   const startTagPattern = new RegExp(`<${tagName.toLowerCase()}[\\s>]`, 'i');
   const endTagPattern = new RegExp(`</${tagName.toLowerCase()}>`, 'i');
@@ -464,15 +354,18 @@ function findClosingTagIndex(str, tagName) {
       remaining = remaining.substring(startMatch.index + startMatch[0].length);
     } else if (endMatch) {
       depth--;
+
       if (depth === 0) {
         return index + endMatch.index;
       }
+
       index += endMatch.index + endMatch[0].length;
       remaining = remaining.substring(endMatch.index + endMatch[0].length);
     } else {
       break;
     }
   }
+
   return -1;
 }
 
@@ -484,18 +377,15 @@ global.document = {
     if (selector === '#app') return testRootElement;
     return null;
   },
+
   querySelectorAll: () => [],
+
   createElement: (tagName) => {
     return new MockElementNode(tagName);
   },
 };
 
 global.DOMParser = class {
-  /**
-   *
-   * @param html
-   * @param type
-   */
   parseFromString(html) {
     const body = createMockElementNode('body');
     const parsed = parseHTML(html);
@@ -517,16 +407,7 @@ global.Node = {
   try {
     console.log('🧪 Testing HTML Slots and Content Transclusion...');
 
-    // Mock Component Classes
-    /**
-     *
-     */
     class CardComponent extends AvenxComponent {
-      /**
-       *
-       * @param bridges
-       * @param props
-       */
       constructor(bridges, props) {
         super(
           {},
@@ -542,31 +423,33 @@ global.Node = {
       }
     }
 
-    /**
-     *
-     */
     class LayoutComponent extends AvenxComponent {
-      /**
-       *
-       * @param bridges
-       * @param props
-       */
       constructor(bridges, props) {
-        super({}, {}, bridges, '<div class="layout">' + '  <slot></slot>' + '</div>', {}, props);
+        super({}, {}, bridges, '<div class="layout"><slot></slot></div>', {}, props);
       }
     }
 
-    /**
-     *
-     */
+    class DynamicSlotComponent extends AvenxComponent {
+      constructor(bridges, props) {
+        super(
+          {
+            slotName: 'header',
+          },
+          {},
+          bridges,
+          '<div class="dynamic-slot">' +
+            '<slot name="{{ state.slotName }}">Dynamic Slot Fallback</slot>' +
+            '</div>',
+          {},
+          props,
+        );
+      }
+    }
+
     class SlotsPage extends AvenxPage {
-      /**
-       *
-       * @param bridges
-       * @param componentRegistry
-       */
       constructor(bridges, componentRegistry) {
         const cp = new ComponentParser(new StyleProcessor());
+
         const compiledTemplate = cp.processComponentTags(
           '<div>' +
             '  <LayoutComponent>' +
@@ -579,8 +462,13 @@ global.Node = {
             '      <!-- Empty card component to test default slot fallback -->' +
             '    </CardComponent>' +
             '  </LayoutComponent>' +
+            '  <DynamicSlotComponent>' +
+            '    <p slot="header">Dynamic Header Content</p>' +
+            '    <p slot="footer">Dynamic Footer Content</p>' +
+            '  </DynamicSlotComponent>' +
             '</div>',
         );
+
         super(
           {
             message: 'Hello World',
@@ -595,25 +483,30 @@ global.Node = {
       }
     }
 
-    // Register components
     const registry = new Map();
     registry.set('CardComponent', CardComponent);
     registry.set('LayoutComponent', LayoutComponent);
+    registry.set('DynamicSlotComponent', DynamicSlotComponent);
 
-    // Mount page
     const page = new SlotsPage({}, registry);
+
     page.mount(testRootElement);
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     // 1. Verify initial layout structure
     console.log('  Testing layout structure...');
+
     const layoutEl = testRootElement.querySelector('.layout');
+
     assert.ok(layoutEl, 'Layout component should render container');
 
-    // 2. Verify Card 1 slot content transclusion
+    // 2. Verify static named and default slots
     console.log('  Testing card 1 header and default slot transclusion...');
+
     const cardHeader = layoutEl.querySelector('.card-header');
+
     assert.ok(cardHeader, 'Card header should exist');
+
     assert.strictEqual(
       cardHeader.textContent.trim(),
       'My Header: Hello World',
@@ -621,23 +514,47 @@ global.Node = {
     );
 
     const cardBody = layoutEl.querySelector('.card-body');
-    assert.ok(cardBody, 'Card body should exist');
-    assert.ok(cardBody.textContent.includes('Body content 1'), 'Default slot should contain paragraph 1');
-    assert.ok(cardBody.textContent.includes('Body content 2'), 'Default slot should contain conditional paragraph 2');
 
-    // 3. Verify Card 2 (empty) fallback default content
+    assert.ok(cardBody, 'Card body should exist');
+
+    assert.ok(
+      cardBody.textContent.includes('Body content 1'),
+      'Default slot should contain paragraph 1',
+    );
+
+    assert.ok(
+      cardBody.textContent.includes('Body content 2'),
+      'Default slot should contain conditional paragraph 2',
+    );
+
+    // 3. Verify fallback content
     console.log('  Testing card 2 fallback content when empty...');
+
     const card2 = layoutEl.querySelectorAll('.card')[1];
+
     assert.ok(card2, 'Card 2 should exist');
+
     const card2Header = card2.querySelector('.card-header');
     const card2Body = card2.querySelector('.card-body');
-    assert.strictEqual(card2Header.textContent.trim(), 'Default Title', 'Should display default slot title');
-    assert.strictEqual(card2Body.textContent.trim(), 'Default Body Content', 'Should display default slot body');
 
-    // 4. Verify parent state reactivity propagation inside transcluded slots
+    assert.strictEqual(
+      card2Header.textContent.trim(),
+      'Default Title',
+      'Should display default slot title',
+    );
+
+    assert.strictEqual(
+      card2Body.textContent.trim(),
+      'Default Body Content',
+      'Should display default slot body',
+    );
+
+    // 4. Verify parent state reactivity
     console.log('  Testing parent state reactivity propagation...');
+
     page.state.message = 'Dynamic Header Update';
     page.state.showSubContent = false;
+
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     assert.strictEqual(
@@ -645,8 +562,67 @@ global.Node = {
       'My Header: Dynamic Header Update',
       'Header should update reactively',
     );
-    assert.ok(cardBody.textContent.includes('Body content 1'), 'Body should retain static content');
-    assert.ok(!cardBody.textContent.includes('Body content 2'), 'Body should hide conditional paragraph');
+
+    assert.ok(
+      cardBody.textContent.includes('Body content 1'),
+      'Body should retain static content',
+    );
+
+    assert.ok(
+      !cardBody.textContent.includes('Body content 2'),
+      'Body should hide conditional paragraph',
+    );
+
+    // 5. Verify dynamic slot name initial resolution
+    console.log('  Testing dynamic slot name resolution...');
+
+    const dynamicSlotContainer = testRootElement.querySelector('.dynamic-slot');
+
+    assert.ok(
+      dynamicSlotContainer,
+      'Dynamic slot component should render',
+    );
+
+    assert.strictEqual(
+      dynamicSlotContainer.textContent.trim(),
+      'Dynamic Header Content',
+      'Dynamic slot should resolve the initial header slot name',
+    );
+
+    // Retrieve the mounted dynamic component instance.
+    const dynamicComponentHost = dynamicSlotContainer.parentNode;
+    const dynamicComponent = dynamicComponentHost.__avenx_comp_instance;
+
+    assert.ok(
+      dynamicComponent,
+      'Dynamic slot component instance should be available',
+    );
+
+    // 6. Verify reactive dynamic slot name updates
+    console.log('  Testing reactive dynamic slot name updates...');
+
+    dynamicComponent.state.slotName = 'footer';
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    assert.strictEqual(
+      dynamicSlotContainer.textContent.trim(),
+      'Dynamic Footer Content',
+      'Dynamic slot should update when its resolved name changes',
+    );
+
+    // 7. Verify fallback for unmatched dynamic slot
+    console.log('  Testing dynamic slot fallback content...');
+
+    dynamicComponent.state.slotName = 'missing';
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    assert.strictEqual(
+      dynamicSlotContainer.textContent.trim(),
+      'Dynamic Slot Fallback',
+      'Dynamic slot should render fallback content when no transclusion matches',
+    );
 
     console.log('  ✅ HTML Slots and Content Transclusion tests passed!');
   } catch (error) {
