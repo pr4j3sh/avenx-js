@@ -608,8 +608,9 @@ export function listenWithPortFallback(server, requestedPort, host, onListening)
  * @param {object} cli
  * @param {number|string} port
  * @param {string} [host]
+ * @param {boolean} [open]
  */
-export function serveProject(cli, port, host = 'localhost') {
+export function serveProject(cli, port, host = 'localhost', open = false) {
   buildProject(cli);
 
   if (cli.config.server.liveReload) {
@@ -706,6 +707,8 @@ export function serveProject(cli, port, host = 'localhost') {
     if (cli.config.server.liveReload) {
       console.log(cyan(`👀 Watching for changes in ${cli.config.srcDir}/...\n`));
     }
-    openBrowser(url);
+    if (open) {
+      openBrowser(url);
+    }
   });
 }

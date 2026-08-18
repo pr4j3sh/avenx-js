@@ -247,7 +247,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/pr4j3sh",
       "profile": "https://github.com/pr4j3sh",
       "contributions": [
-        "code"
+        "code",
+        "doc"
       ]
     },
     {
@@ -894,6 +895,24 @@
       "profile": "https://tyr1onx.github.io/",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "REAPER2705",
+      "name": "AKSHAT BHARDWAJ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/206106439?v=4",
+      "profile": "https://github.com/REAPER2705",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "deekshithasajja-maker",
+      "name": "Sajja Deekshitha",
+      "avatar_url": "https://avatars.githubusercontent.com/u/252833550?v=4",
+      "profile": "https://github.com/deekshithasajja-maker",
+      "contributions": [
+        "doc"
       ]
     }
   ],

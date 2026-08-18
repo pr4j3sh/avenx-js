@@ -51,8 +51,8 @@ function runTests() {
 async function testCliServeParsing() {
   let lastCall = null;
   class TestCLI extends AvenxCLI {
-    serveProject(port, host) {
-      lastCall = { port, host };
+    serveProject(port, host, open) {
+      lastCall = { port, host, open };
     }
   }
 
@@ -60,23 +60,31 @@ async function testCliServeParsing() {
 
   // Test --port 3000/
   await cli.run('serve', ['--port', '3000/']);
-  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost' });
+  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost', open: false });
 
   // Test --host localhost/
   await cli.run('serve', ['--host', 'localhost/']);
-  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost' });
+  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost', open: false });
 
   // Test trailing slashes and accidental whitespace
   await cli.run('serve', ['--port', ' 3000/ ', '--host', ' 127.0.0.1/ ']);
-  assert.deepStrictEqual(lastCall, { port: 3000, host: '127.0.0.1' });
+  assert.deepStrictEqual(lastCall, { port: 3000, host: '127.0.0.1', open: false });
 
   // Test positional port 3000/
   await cli.run('serve', ['3000/']);
-  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost' });
+  assert.deepStrictEqual(lastCall, { port: 3000, host: 'localhost', open: false });
 
   // Test flag assignments --port=8080/ --host=localhost/
   await cli.run('serve', ['--port=8080/', '--host=localhost/']);
-  assert.deepStrictEqual(lastCall, { port: 8080, host: 'localhost' });
+  assert.deepStrictEqual(lastCall, { port: 8080, host: 'localhost', open: false });
+
+  // Test --open flag
+  await cli.run('serve', ['--open']);
+  assert.deepStrictEqual(lastCall, {port: 3000, host: 'localhost', open: true});
+
+  // Test -o flag
+  await cli.run('serve', ['-o']);
+  assert.deepStrictEqual(lastCall, {port: 3000, host: 'localhost', open: true});
 }
 
 function testRequestLoggerFormatting() {

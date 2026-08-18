@@ -192,6 +192,36 @@ class MockDOMElement {
     return results;
   }
 
+  querySelector(selector) {
+    const list = this.querySelectorAll(selector);
+    return list.length > 0 ? list[0] : null;
+  }
+
+  isEqualNode(other) {
+    if (!other || this.nodeType !== other.nodeType) return false;
+    if (this.nodeType === 1) {
+      if (this.tagName !== other.tagName) return false;
+      const thisAttrs = Object.keys(this._attrs || {});
+      const otherAttrs = Object.keys(other._attrs || {});
+      if (thisAttrs.length !== otherAttrs.length) return false;
+      for (const k of thisAttrs) {
+        if (this._attrs[k] !== other._attrs[k]) return false;
+      }
+      if (this.childNodes.length !== other.childNodes.length) return false;
+      for (let i = 0; i < this.childNodes.length; i++) {
+        const c1 = this.childNodes[i];
+        const c2 = other.childNodes[i];
+        if (c1.isEqualNode) {
+          if (!c1.isEqualNode(c2)) return false;
+        } else if (c1.textContent !== c2.textContent) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return this.textContent === other.textContent;
+  }
+
   addEventListener(event, callback) {
     this.recordedCalls.push({ method: 'addEventListener', event, callback });
   }

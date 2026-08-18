@@ -41,9 +41,10 @@ export class AvenxCLI {
    * Serves the project on specified port and host.
    * @param {number} port
    * @param {string} host
+   * @param {boolean} [open] - Whether to open the browser automatically.
    */
-  serveProject(port, host) {
-    return serveProject(this, port, host);
+  serveProject(port, host, open) {
+    return serveProject(this, port, host, open);
   }
 
   /**
@@ -167,6 +168,7 @@ export class AvenxCLI {
       case 'serve': {
         const portIdx = args.findIndex((a) => a === '--port' || a === '-p' || a.startsWith('--port=') || a.startsWith('-p='));
         const hostIdx = args.findIndex((a) => a === '--host' || a === '-h' || a.startsWith('--host=') || a.startsWith('-h='));
+        const open = args.includes('--open') || args.includes('-o');
 
         if (args.includes('--no-live-reload') || args.includes('--live-reload=false')) {
           this.config.server.liveReload = false;
@@ -185,7 +187,7 @@ export class AvenxCLI {
           : null;
         const host = rawHostVal ? rawHostVal.trim().replace(/\/+$/g, '') : 'localhost';
 
-        this.serveProject(port, host);
+        this.serveProject(port, host, open);
         break;
       }
       case 'watch':
