@@ -1420,23 +1420,18 @@ The constructor takes no arguments.
 
 Compares two HTML strings for equality. If they differ, returns the next HTML string. If they are identical, returns `null`.
 
-**Signature:**
+- **Signature:** `diff(currentHtml: string, nextHtml: string): string | null`
 
-`diff(currentHtml: string, nextHtml: string): string | null`
+- **Parameters:**
 
-**Parameters:**
+  - `currentHtml: string`: The current HTML content to compare against.
+  - `nextHtml: string`: The new HTML content to compare.
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `currentHtml` | `string` | The current HTML content to compare against. |
-| `nextHtml` | `string` | The new HTML content to compare. |
+- **Returns:**
 
-**Returns:**
+  - `string | null`: `string` if the `nextHtml` value differs from `currentHtml` and `null` if both strings are identical.
 
-- `string` — The `nextHtml` value if it differs from `currentHtml`.
-- `null` — If both strings are identical.
-
-**Example**
+### Usage Example
 
 ```javascript
 import { HtmlDiff } from 'avenx-core/runtime';
@@ -1482,25 +1477,14 @@ The constructor takes no arguments. Session state (`sessionElements`, `patchRoot
 
 Main entry point. Parses `html` into a DOM tree via `DOMParser`, then recursively diffs and patches `target` against the parsed result.
 
-**Signature:**
+- **Signature:** `patch(target: Element, html: string, resolveExpression?: Function, app?: object): void`
 
-`patch(target: Element, html: string, resolveExpression?: Function, app?: object): void`
+- **Parameters:**
 
-**Parameters:**
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `target` | `Element` | The live DOM element to patch. |
-| `html` | `string` | The new HTML string to parse and reconcile against `target`. |
-| `resolveExpression` | `Function` (optional) | Callback to evaluate template expressions. |
-| `app` | `object` (optional) | The `AvenxApp` instance, used for directive registry and lifecycle hooks. |
-
-**Flow:**
-
-1. Parses `html` via `DOMParser.parseFromString()`
-2. Flattens `<transition>` wrapper tags into per-child `data-ax-transition` attributes
-3. Recursively diffs `target` against the parsed body via `#patchNode`
-4. Flushes directive lifecycle hooks (`mounted`, `updated`)
+  - `target: Element`: The live DOM element to patch.
+  - `html: string`: The new HTML string to parse and reconcile against `target`.
+  - `resolveExpression: Function` (optional): Callback to evaluate template expressions.
+  - `app: object` (optional): The `AvenxApp` instance, used for directive registry and lifecycle hooks.
 
 ---
 
@@ -1508,18 +1492,14 @@ Main entry point. Parses `html` into a DOM tree via `DOMParser`, then recursivel
 
 Alternate entry point for diffing two live DOM elements directly, without HTML string parsing.
 
-**Signature:**
+- **Signature:** `patchElement(oldElement: Element, newElement: Element, resolveExpression?: Function, app?: object): void`
 
-`patchElement(oldElement: Element, newElement: Element, resolveExpression?: Function, app?: object): void`
+- **Parameters:**
 
-**Parameters:**
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `oldElement` | `Element` | The existing live DOM element to patch in place. |
-| `newElement` | `Element` | The new element to diff against. |
-| `resolveExpression` | `Function` (optional) | Callback to evaluate template expressions. |
-| `app` | `object` (optional) | The `AvenxApp` instance. |
+  - `oldElement: Element`: The existing live DOM element to patch in place.
+  - `newElement: Element`: The new element to diff against.
+  - `resolveExpression: Function` (optional): Callback to evaluate template expressions.
+  - `app: object` (optional): The `AvenxApp` instance.
 
 ---
 
@@ -1527,9 +1507,7 @@ Alternate entry point for diffing two live DOM elements directly, without HTML s
 
 Recursively evaluates all directives on an element tree without performing any diffing or patching. Useful for initializing directives on freshly created DOM nodes.
 
-**Signature:**
-
-`applyDirectives(element: Element, resolveExpression: Function, app?: object): void`
+- **Signature:** `applyDirectives(element: Element, resolveExpression: Function, app?: object): void`
 
 ---
 
@@ -1537,29 +1515,23 @@ Recursively evaluates all directives on an element tree without performing any d
 
 Post-processing helper. Flattens `<transition>` wrapper tags and removes boolean attributes that evaluate to `false`. Returns the element.
 
-**Signature:**
-
-`cleanElement(element: Element): Element`
+- **Signature:** `cleanElement(element: Element): Element`
 
 ---
 
 #### `enter(el, transitionName)`
 
-Executes the CSS enter-transition sequence on an element: `{name}-enter` → `{name}-enter-active` → `{name}-enter-to`.
+Executes the CSS enter-transition sequence on an element.
 
-**Signature:**
-
-`enter(el: Element, transitionName: string): void`
+- **Signature:** `enter(el: Element, transitionName: string): void`
 
 ---
 
 #### `leave(el, transitionName, removeCallback)`
 
-Executes the CSS leave-transition sequence on an element: `{name}-leave` → `{name}-leave-active` → `{name}-leave-to`, then calls `removeCallback` to handle DOM removal.
+Executes the CSS leave-transition sequence on an element, then calls `removeCallback` to handle DOM removal.
 
-**Signature:**
-
-`leave(el: Element, transitionName: string, removeCallback: Function): void`
+- **Signature:** `leave(el: Element, transitionName: string, removeCallback: Function): void`
 
 ---
 
@@ -1567,9 +1539,7 @@ Executes the CSS leave-transition sequence on an element: `{name}-leave` → `{n
 
 Recursively invokes the `unmounted` lifecycle hook on a node and all its descendants.
 
-**Signature:**
-
-`triggerUnmounted(node: Node, app: object): void`
+- **Signature:** `triggerUnmounted(node: Node, app: object): void`
 
 ---
 
@@ -1577,9 +1547,7 @@ Recursively invokes the `unmounted` lifecycle hook on a node and all its descend
 
 Iterates all elements tracked during the current patch session and dispatches lifecycle hooks: `mounted()` for first-time elements, `updated()` for elements with changed values, and `unmounted()` for disconnected elements.
 
-**Signature:**
-
-`flushLifecycleHooks(app: object): void`
+- **Signature:** `flushLifecycleHooks(app: object): void`
 
 ---
 
@@ -1587,7 +1555,7 @@ Iterates all elements tracked during the current patch session and dispatches li
 
 The core diffing logic lives in the private `#patchNode` method. It performs a recursive, position-based reconciliation of the old and new DOM trees.
 
-#### Phase 0: Early-Exit Guards
+#### Early-Exit Guards
 
 Before recursing into children, `#patchNode` checks for several special cases where child diffing should be skipped:
 
@@ -1596,10 +1564,11 @@ Before recursing into children, `#patchNode` checks for several special cases wh
 | Transcluded slot | `<slot data-avenx-transcluded>` (non-root) | Patch attributes only, skip children |
 | Component boundary | `data-avenx-comp` or `data-avenx-comp-dynamic` (non-root) | Patch attributes, delegate children to component instance via `__updateTranscludedContent()` |
 | Template / @for | `<template>` or `@for` (non-root) | Patch attributes only |
-| Static marker | `data-ax-static` (non-root) | Skip entirely — subtree is immutable |
-| Memoization | `data-ax-memo` + `isEqualNode()` returns true (non-root) | Skip — subtree is structurally identical |
+| Static marker | `data-ax-static` (non-root) | Skip entirely - subtree is immutable |
+| Memoization | `data-ax-memo` + `isEqualNode()` returns true (non-root) | Skip - subtree is structurally identical |
 
-#### Phase 1: Patch Attributes
+
+#### Patch Attributes
 
 If both nodes are elements, `#patchAttributes` synchronizes attributes from the new node to the old node:
 
@@ -1607,18 +1576,18 @@ If both nodes are elements, `#patchAttributes` synchronizes attributes from the 
 - Adds or updates attributes present in the new node
 - Handles boolean attribute semantics (`checked`, `disabled`, `required`, etc.)
 - Force-syncs `value` on form elements (`input`, `textarea`, `select`)
-- Optimizes `class` attribute comparison using unordered token-set equality (`classTokensEqual`) — `"foo bar"` and `"bar foo"` are treated as equal
+- Optimizes `class` attribute comparison using unordered token-set equality (`classTokensEqual`) - `"foo bar"` and `"bar foo"` are treated as equal
 - Cleans up stale dynamic attribute names tracked in `data-ax-dyn-attrs`
 
 After attribute patching, `#applyDirectives` is called to evaluate all directives on the element.
 
-#### Phase 2: Diff and Patch Children
+#### Diff and Patch Children
 
 A two-pointer walk reconciles the old and new child node lists:
 
-1. **Normalize** — Consecutive text nodes are coalesced in both lists to prevent spurious diffs from whitespace normalization differences. Nodes with `_isLeaving` (in-flight leave animations) are excluded from the old list.
+1. **Normalize**: Consecutive text nodes are coalesced in both lists to prevent spurious diffs from whitespace normalization differences. Nodes with `_isLeaving` (in-flight leave animations) are excluded from the old list.
 
-2. **Walk** — `oldIndex` and `newIndex` advance through both child arrays:
+2. **Walk**: `oldIndex` and `newIndex` advance through both child arrays:
 
    | Situation | Action |
    | --- | --- |
@@ -1626,17 +1595,9 @@ A two-pointer walk reconciles the old and new child node lists:
    | Same node type (`#isSameNodeType`) | **Patch in-place**: update `textContent` for text nodes, recurse into `#patchNode` for elements. |
    | Different node type | **Replace**: insert new node, animate old node out via `triggerLeave` if transition exists, otherwise `replaceChild`. Trigger enter transition on new node. |
 
-3. **Sync `<select>`** — After children are patched, if the node is a `<select>`, its `.value` is force-synced from the new node's `value` attribute.
+3. **Sync `<select>`**: After children are patched, if the node is a `<select>`, its `.value` is force-synced from the new node's `value` attribute.
 
-4. **Remove excess** — Any remaining old children (except `data-ax-list-item` nodes managed by `ListManager`) are animated out via `triggerLeave`.
-
-**Algorithm characteristics:**
-
-- **O(n)** per level in the number of children
-- Position + type matching — no keyed reconciliation
-- Preserves DOM identity (focus, selections) for same-type elements
-- Transition-aware replacements
-- SVG namespace correction via `#prepareNode`
+4. **Remove excess**: Any remaining old children (except `data-ax-list-item` nodes managed by `ListManager`) are animated out via `triggerLeave`.
 
 ---
 
@@ -1646,9 +1607,9 @@ Directives are evaluated inside `#applyDirectives` in a strict priority order. E
 
 | Priority | Directive | Behavior |
 | --- | --- | --- |
-| 1 | `data-ax-html` | Evaluates expression, sets `innerHTML`. Accepts `SafeHtml` for raw output or escapes via `HtmlEscaper`. Sets `skipChildren = true` — all child diffing is skipped. |
+| 1 | `data-ax-html` | Evaluates expression, sets `innerHTML`. Accepts `SafeHtml` for raw output or escapes via `HtmlEscaper`. Sets `skipChildren = true` - all child diffing is skipped. |
 | 2 | `data-ax-show` | Evaluates boolean expression. Toggles `display: none` with transition support (`enter`/`leave`). Preserves original `display` value. |
-| 3 | `data-ax-class` | Accepts a string (space-separated classes) or object (`{ className: boolean }`). Removes previous classes, adds new set — idempotent across re-renders. |
+| 3 | `data-ax-class` | Accepts a string (space-separated classes) or object (`{ className: boolean }`). Removes previous classes, adds new set - idempotent across re-renders. |
 | 4 | `:[attr]="expr"` | Dynamic attribute name binding. Evaluates bracketed expression for the actual attribute name. Tracks previous names in `__avenxDynAttrs` for cleanup. |
 | 5 | `data-ax-*` (custom) | Custom directive registrations. Splits attribute on `.` for modifier support. Manages lifecycle hooks (`mounted`, `updated`, `unmounted`) via session tracking. |
 
@@ -1662,16 +1623,17 @@ Directives are evaluated inside `#applyDirectives` in a strict priority order. E
 | `data-ax-show` | Toggles visibility via `display: none` with transition support |
 | `data-ax-class` | Dynamic class binding (string or `{cls: bool}` object) |
 | `data-ax-transition` | Names the CSS transition (e.g., `"fade"`, `"slide"`) |
-| `data-ax-static` | Marks a subtree as immutable — patching skips it entirely |
-| `data-ax-memo` | Memoization — skips patching if `isEqualNode` returns true |
+| `data-ax-static` | Marks a subtree as immutable - patching skips it entirely |
+| `data-ax-memo` | Memoization - skips patching if `isEqualNode` returns true |
 | `data-ax-dyn-attrs` | Internal tracker for previously-applied dynamic attribute names |
 | `data-ax-*` (custom) | Custom directive registrations with dot-notation modifiers |
-| `data-ax-list-item` | Marks a node as managed by `ListManager` — skipped during diff |
-| `data-avenx-comp` | Component boundary marker — patching delegates to component instance |
+| `data-ax-list-item` | Marks a node as managed by `ListManager` - skipped during diff |
+| `data-avenx-comp` | Component boundary marker - patching delegates to component instance |
 | `data-avenx-transcluded` | Marks a `<slot>` as containing transcluded content |
 | `:[expr]="expr"` | Dynamic attribute name/value binding |
 
-### Example
+
+### Usage Example
 
 ```javascript
 import { DomPatcher } from 'avenx-core/runtime';
@@ -1688,4 +1650,4 @@ patcher.patch(target, newHtml, (expression, scope) => {
 });
 ```
 
-In practice, `DomPatcher` is instantiated internally by `AvenxComponent` and invoked during the component's `runUpdate()` cycle — application code rarely calls it directly.
+In practice, `DomPatcher` is instantiated internally by `AvenxComponent` and invoked during the component's `runUpdate()` cycle - application code rarely calls it directly.
