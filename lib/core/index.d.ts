@@ -911,4 +911,25 @@ export function findProjectRoot(filePath: string, fallbackRoot: string): string;
 export function profile<T = any>(enableProfiling: boolean, componentName: string, phase: string, fn: () => T): T;
 export function getComponentProfilingInfo(element: any): { enableProfiling: boolean; componentName: string };
 
+export class DeadlockManager {
+    constructor(evaluator: any, renderer: any, eventBinder?: any, componentName?: string);
+    isTripped(container: any): boolean;
+    findBoundaries(root: any): any[];
+    trip(container: any, error?: Error | object, scope?: object): void;
+    reset(container: any): void;
+}
+
+export function setSchedulerMaxFlushCount(count: number): void;
+export function getSchedulerMaxFlushCount(): number;
+export interface SchedulerDeadlockEvent {
+    cyclePath: string;
+    triggeringJobId?: any;
+    executionHistory?: Array<{ id: any; name: string; job: Function }>;
+}
+export function onSchedulerDeadlock(handler: (event: SchedulerDeadlockEvent) => void): () => void;
+export function resetScheduler(): void;
+
+export function getActiveCausationTrace(): string[];
+export function clearCausationTrace(): void;
+
 

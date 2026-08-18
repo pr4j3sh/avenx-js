@@ -63,6 +63,27 @@ Fetch data seamlessly with `<resource>` declarations and handle loading & error 
 </@errorBoundary>
 ```
 
+### 🛡️ Reactive Deadlock Boundary (`<@deadlock>`)
+
+Protect sections of your component tree against circular update loops ($A \rightarrow B \rightarrow A$) and infinite reactive cascades:
+
+```html
+<@deadlock name="dashboard-boundary" maxDepth="8" action="fallback">
+  <Sidebar />
+  <Content />
+  <Stats />
+  <@fallback as="err">
+    <div class="deadlock-alert">
+      ⚠️ Reactive cycle intercepted in {{ name }}: {{ err.message }}
+    </div>
+  </@fallback>
+</@deadlock>
+```
+
+- **Cycle Detection:** Automatically monitors recursive microtask and watcher execution to prevent thread freezes.
+- **Diagnostics (`AVX_R18`):** Emits clear causation chain traces (e.g. `Counter -> Stats -> Counter`).
+- **Declarative Recovery:** Unmounts cyclically deadlocked child components and renders an isolated `<@fallback>` UI.
+
 ### 🛠️ CLI-First Workflow
 
 Generate components, pages, and bridges with a single command. The built-in dev server provides hot-reloading for a seamless development experience.
