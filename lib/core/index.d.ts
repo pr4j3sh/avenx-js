@@ -692,6 +692,11 @@ export interface AvenxLoggerOptions {
     transports?: Array<any | ((level: string, formattedArgs: any[], rawArgs: any[]) => void)>;
 }
 
+export interface AvenxLoggerBindings {
+    prefix?: string;
+    componentName?: string;
+}
+
 export class AvenxLogger {
     config: {
         level: string;
@@ -699,11 +704,13 @@ export class AvenxLogger {
         formatter: (level: string, args: any[]) => any[];
         transports: any[];
     };
+    bindings: Record<string, any>;
     constructor(config?: AvenxLoggerOptions);
     configure(config: AvenxLoggerOptions): void;
     setLevel(level: string): void;
     shouldLog(level: string): boolean;
     write(level: string, ...args: any[]): void;
+    child(bindings?: string | AvenxLoggerBindings): AvenxLogger;
     trace(...args: any[]): void;
     debug(...args: any[]): void;
     info(...args: any[]): void;
